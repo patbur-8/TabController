@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+
+  "name": "NoDups",
+  "description": "Removes all duplicated tabs",
+  "version": "1.0",
+
+  "permissions": [
+    "tabs"
+  ],
+
+
+  "browser_action": {
+    "default_title": "Remove duplicated tabs",
+    "default_icon": "print_16x16.png",
+    "default_popup": "popup.html"
+  }
+}
