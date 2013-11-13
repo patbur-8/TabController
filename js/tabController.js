@@ -2,37 +2,37 @@
 //Automatisk kategorisering av bookmarks
 window.onload = function() {
 
-	var removeDuplicatesButton = document.getElementById("removeDuplicates");
+	var removeDuplicatesButton = document.getElementById("remove_this");
     removeDuplicatesButton.onclick = function() {
     	removeDuplicates(-1);
     	return false;
     }
 
-   	var removeDuplicatesAllButton = document.getElementById("removeDuplicatesAll");
+   	var removeDuplicatesAllButton = document.getElementById("remove_all");
     removeDuplicatesAllButton.onclick = function() {
     	removeDuplicatesAllWindows();
     	return false;
     }
 
-    var reorderTabsButton = document.getElementById("reorderTabs");
+    var reorderTabsButton = document.getElementById("sort_this");
     reorderTabsButton.onclick = function() {
     	reorderTabs(-1);
     	return false;
     }
 
-   	var reorderTabsAllButton = document.getElementById("reorderTabsAll");
+   	var reorderTabsAllButton = document.getElementById("sort_all");
     reorderTabsAllButton.onclick = function() {
     	reorderTabsAllWindows();
     	return false;
     }
 
-    var mergeWindowsButton = document.getElementById("mergeAll");
+    var mergeWindowsButton = document.getElementById("merge_all");
     mergeWindowsButton.onclick = function() {
     	startMerge();
     	return false;
     }
 
-    var splitCurrentButton = document.getElementById("splitCurrent");
+    var splitCurrentButton = document.getElementById("split_this");
     splitCurrentButton.onclick = function() {
     	createNewWindow();
     	return false;
