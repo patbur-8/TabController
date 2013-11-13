@@ -9,12 +9,12 @@
     "tabs"
   ],
   "icons": {
-    "48": "icon48.png",
-    "128": "icon128.png"},
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"},
 
   "browser_action": {
     "default_title": "Manage chrome tabs",
-    "default_icon": "eight.png",
+    "default_icon": "images/icon19.png",
     "default_popup": "popup.html"
   }
 

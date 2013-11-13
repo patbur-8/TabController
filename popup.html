@@ -1,15 +1,20 @@
 <html>
 <head>
-	<link href="controller.css" rel="stylesheet">
+	<link href="style.css" rel="stylesheet">
 	<script src="tabcontroller.js"></script>
-	<style type="text/css"></style>
 </head>
 <body>
-    <a id="removeDuplicates" href="#">Remove duplicates</a> ||||| 
-    <a id="removeDuplicatesAll" href="#">Remove duplicates on all windows</a><br>
-    <a id="reorderTabs" href="#">Reorder tabs</a> ||||| 
-    <a id="reorderTabsAll" href="#">Reorder tabs on all windows</a><br>
-    <a id="mergeAll" href="#">Merge all windows</a><br>
-    <a id="splitCurrent" href="#">Split current window</a>             
+	<div class="topcont">
+		<button id="sort_all">Sort (All Windows)</button>
+		<button id="sort_this">Sort (This Window)</button>
+	</div>
+	<div class="container">
+		<button id="merge_all"> Merge (All Windows)</button>
+		<button id="split_this">Split (This Window)</button>
+	</div>
+	<div class="container">
+		<button id="remove_all">Remove Duplicates (All Windows)</button>
+		<button id="remove_this">Remove Duplicates (This Window)</button>
+	</div>
 </body>
 </html>
