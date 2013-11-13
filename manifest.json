@@ -2,13 +2,15 @@
   "manifest_version": 2,
 
   "name": "TabController",
-  "description": "Manages tabs",
+  "description": "TabController is an extension for Google Chrome that helps you manage your tabs.",
   "version": "1.0",
 
   "permissions": [
     "tabs"
   ],
-  "icons": {"128": "first128x128.png"},
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"},
 
   "browser_action": {
     "default_title": "Manage chrome tabs",

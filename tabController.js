@@ -199,10 +199,12 @@ function moveTabsToNewWindow(tab) {
 	    console.log(tabOrder);
 	    console.log(newWindowId);
 		for(var j = tabOrder.length-1; j>0; j--) {
+			if(j === tabOrder.length-1) {
+				removeDefaultNewTab();
+			}
 			var id = tabOrder[j][1];
 			moveTab(id,j, newWindowId);
 		}
-		removeDefaultNewTab();
 	});
 }
 
