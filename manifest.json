@@ -1,18 +1,20 @@
 {
   "manifest_version": 2,
 
-  "name": "NoDups",
-  "description": "Removes all duplicated tabs",
+  "name": "TabController",
+  "description": "Manages tabs",
   "version": "1.0",
 
   "permissions": [
     "tabs"
   ],
-
+  "icons": {"128": "first128x128.png"},
 
   "browser_action": {
-    "default_title": "Remove duplicated tabs",
-    "default_icon": "print_16x16.png",
+    "default_title": "Manage chrome tabs",
+    "default_icon": "eight.png",
     "default_popup": "popup.html"
   }
+
+
 }
