@@ -34,7 +34,6 @@ window.onload = function() {
 
     var splitCurrentButton = document.getElementById("split_this");
     splitCurrentButton.onclick = function() {
-    	//createNewWindow();
     	getCurrentTab();
     	return false;
     }
@@ -116,9 +115,9 @@ function moveTabData(index, windowId) {
   return params;
 }
 
-function moveTab(id, index, windowId) {
+function moveTab(id, index, windowId, callback) {
   try {
-    chrome.tabs.move(id, moveTabData(index, windowId));
+    chrome.tabs.move(id, moveTabData(index, windowId), callback);
   } catch (e) {
     alert(e);
   }
@@ -162,60 +161,11 @@ function mergeAllWindow(windows) {
       }
     }
   }
+  window.close();
 }
 
-/*var newWindowId;
-function createNewWindow() {
-	chrome.windows.create({}, getCurrentTab);
-}
-
-function getCurrentTab(win) {
-	console.log(win);
-	newWindowId = win.id;
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-	    moveTabsToNewWindow(tabs[0]);
-	});
-}
-
-
-function moveTabsToNewWindow(tab) {
-	console.log(tab);
-	var currentTabId = tab.id;
-	console.log(currentTabId);
-	var tabOrder = [];
-	chrome.tabs.query({"currentWindow" : true}, function(tabs) {
-		var addNext = false;
-		for (var i = 0; i < tabs.length; i++) {
-				    	if(tabs[i].id === currentTabId) {
-	    		console.log("addNext === true");
-				addNext = true;
-			}   
-			console.log("new loop");
-			if(addNext === true) {
-				console.log("added");
-				tabOrder.push([tabs[i].url,tabs[i].id]);  
-			}
-                 
-	    }
-	    console.log(tabOrder);
-	    console.log(newWindowId);
-		for(var j = tabOrder.length-1; j>0; j--) {
-			if(j === tabOrder.length-1) {
-				removeDefaultNewTab();
-			}
-			var id = tabOrder[j][1];
-			moveTab(id,j, newWindowId);
-		}
-	});
-}
-
-function removeDefaultNewTab() {
-	chrome.tabs.query({'active': true, 'windowId': newWindowId}, function (tabs) {
-		var tabId = tabs[0].id;
-		chrome.tabs.remove(tabId, null);
-	});
-}*/
 function getCurrentTab() {
+	//kolla om det är sista tabben
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 	    createNewWindow(tabs[0]);
 	});
@@ -227,7 +177,7 @@ function createNewWindow(tab) {
 	console.log(tab);
 	console.log(tab.id);
 	console.log(tab.windowId);
-	chrome.windows.create({}, moveTabsToNewWindow);
+	chrome.windows.create({"focused": false}, moveTabsToNewWindow);
 }
 
 function moveTabsToNewWindow(win) {
@@ -246,12 +196,14 @@ function moveTabsToNewWindow(win) {
                  
 	    }
 		for(var j = tabOrder.length-1; j>0; j--) {
-			if(j === tabOrder.length-1) {
-				removeDefaultNewTab(win.id);	
-			}
 			var id = tabOrder[j][1];
-			moveTab(id,j, win.id);
+			if(j === tabOrder.length-1) {
+				moveTab(id,j, win.id,removeDefaultNewTab(win.id));	
+			} else {
+				moveTab(id,j, win.id);
+			}
 		}
+		window.close();
 	});
 }
 
