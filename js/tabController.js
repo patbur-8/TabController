@@ -166,8 +166,17 @@ function mergeAllWindow(windows) {
 
 function getCurrentTab() {
 	//kolla om det är sista tabben
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-	    createNewWindow(tabs[0]);
+	chrome.tabs.query({currentWindow: true}, function(tabs){
+		var currentTab;
+		for(var i = 0; i < tabs.length; i++) {
+			if(tabs[i].active === true) {
+				if(i === tabs.length-1) {
+					return;
+				}
+				currentTab = tabs[i];
+			}
+		}
+	    createNewWindow(currentTab);
 	});
 }
 
