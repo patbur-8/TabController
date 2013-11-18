@@ -37,6 +37,44 @@ window.onload = function() {
     	getCurrentTab();
     	return false;
     }
+
+    var splitOriginButton = document.getElementById("split_origin_this");
+    splitOriginButton.onclick = function() {
+    	startSplitOriginThis();
+    	return false;
+    }
+
+    var splitOriginAllButton = document.getElementById("split_origin_all");
+    splitOriginAllButton.onclick = function() {
+    	startSplitOriginAll();
+    	return false;
+    }
+
+    var closeOriginButton = document.getElementById("close_origin_this");
+    closeOriginButton.onclick = function() {
+    	closeCurrentOriginThisWindow();
+    	return false;
+    }
+
+    var closeOriginAllButton = document.getElementById("close_origin_all");
+    closeOriginAllButton.onclick = function() {
+    	closeCurrentOriginAllWindows();
+    	return false;
+    }
+
+    var gatherOriginAllButton = document.getElementById("gather_origin_this");
+    gatherOriginAllButton.onclick = function() {
+    	gatherCurrentOriginAllWindows();
+    	return false;
+    }
+}
+
+function getOrigin(url) {
+	return url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1];
+}
+
+function finishedRunning() {
+	window.close();
 }
 
 function removeDuplicatesAllWindows() {
@@ -61,7 +99,7 @@ function removeDuplicates(windowId) {
 	var tabOrder = [];
 	chrome.tabs.query(params, function(tabs) {
 		for (var i = 0; i < tabs.length; i++) {
-			var domain = tabs[i].url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1];
+			var domain = getOrigin(tabs[i].url);
 	    	tabOrder.push([domain,tabs[i].id]);                      
 	    }
 
@@ -161,7 +199,7 @@ function mergeAllWindow(windows) {
       }
     }
   }
-  window.close();
+  finishedRunning();
 }
 
 function getCurrentTab() {
@@ -171,6 +209,7 @@ function getCurrentTab() {
 		for(var i = 0; i < tabs.length; i++) {
 			if(tabs[i].active === true) {
 				if(i === tabs.length-1) {
+					finishedRunning();
 					return;
 				}
 				currentTab = tabs[i];
@@ -212,13 +251,163 @@ function moveTabsToNewWindow(win) {
 				moveTab(id,j, win.id);
 			}
 		}
-		window.close();
+		finishedRunning();
 	});
 }
 
 function removeDefaultNewTab(newWindowId) {
 	chrome.tabs.query({'active': true, 'windowId': newWindowId}, function (tabs) {
 		var tabId = tabs[0].id;
+		console.log(tabs[0]);
 		chrome.tabs.remove(tabId, null);
 	});
 }
+
+//// BETA
+
+function startSplitOriginThis() {
+	chrome.windows.create({"focused": false}, splitCurrentOriginThisWindow);
+}
+
+function splitCurrentOriginThisWindow(win) {
+	chrome.tabs.query({"currentWindow": true}, function(tabs){
+		console.log(tabs);
+		console.log(tabs.length);
+		var origin;
+		for(var i = 0; i < tabs.length; i++) {
+			if(tabs[i].active === true) {
+				origin = getOrigin(tabs[i].url);
+				console.log(origin);
+				break;
+			}
+		}
+		console.log("second loop");
+		for(var j = 0; j < tabs.length; j++) {
+			console.log(getOrigin(tabs[j].url));
+			console.log(origin);
+			console.log(getOrigin(tabs[j].url) === origin);
+			var deleteFirst = true;
+			if(getOrigin(tabs[j].url) === origin) {
+				if(deleteFirst) {
+					moveTab(tabs[j].id, j, win.id, removeDefaultNewTab(win.id));
+					deleteFirst = false;
+				} else {
+					console.log("move");
+					moveTab(tabs[j].id, j, win.id);
+				}
+				
+			}
+		}
+	});
+}
+
+function startSplitOriginAll() {
+	chrome.windows.create({"focused": false}, splitCurrentOriginAllWindows);
+}
+
+function splitCurrentOriginAllWindows(newWindow) {
+	chrome.tabs.query({"currentWindow": true, "active": true}, function(tabs){
+		var origin = getOrigin(tabs[0].url);
+		chrome.windows.getAll({"populate" : true}, function(windows){
+			var deleteFirst = true;
+			var numWindows = windows.length;
+			for (var i = 0; i < numWindows; i++) {
+				var win = windows[i];
+				if(newWindow.id != win.id) {
+					var numTabs = win.tabs.length;
+			    	for (var j = 0; j < numTabs; j++) {
+			        	var tab = win.tabs[j];
+			        	if(getOrigin(tab.url) === origin) {
+			        		if(deleteFirst) {
+								console.log("move first");
+								moveTab(tab.id, i, newWindow.id, removeDefaultNewTab(newWindow.id));
+								deleteFirst = false;
+							} else {
+								console.log("move");
+								moveTab(tab.id, i, newWindow.id);
+							}
+			        	}
+			        }
+				}
+			}
+		});
+	});
+}
+//CLOSE ORIGIN
+
+function closeCurrentOriginThisWindow() {
+	chrome.tabs.query({"currentWindow": true}, function(tabs){
+		console.log(tabs);
+		console.log(tabs.length);
+		var origin;
+		var originTab;
+		for(var i = 0; i < tabs.length; i++) {
+			if(tabs[i].active === true) {
+				origin = getOrigin(tabs[i].url);
+				originTab = tabs[i];
+				console.log(origin);
+				break;
+			}
+		}
+		console.log("second loop");
+		for(var j = 0; j < tabs.length; j++) {
+			if(getOrigin(tabs[j].url) === origin) {
+				if(tabs[j] != originTab) {
+					chrome.tabs.remove(tabs[j].id, null);
+				}
+			}
+		}
+		chrome.tabs.remove(originTab.id, null);
+	});
+}
+
+function closeCurrentOriginAllWindows() {
+	chrome.tabs.query({"currentWindow": true, "active": true}, function(tabs){
+		var origin = getOrigin(tabs[0].url);
+		var originTab = tabs[0];
+		chrome.windows.getAll({"populate" : true}, function(windows){
+			var numWindows = windows.length;
+			for (var i = 0; i < numWindows; i++) {
+				var win = windows[i];
+				var numTabs = win.tabs.length;
+		    	for (var j = 0; j < numTabs; j++) {
+		        	var tab = win.tabs[j];
+		        	if(getOrigin(tab.url) === origin) {
+						if(tab != originTab) {
+							chrome.tabs.remove(tab.id, null);
+						}
+		        	}
+		        }
+			}
+			chrome.tabs.remove(originTab.id, null);
+		});
+	});
+}
+
+// GATHER ORIGIN
+
+function gatherCurrentOriginAllWindows() {
+	chrome.tabs.query({"currentWindow": true, "active": true}, function(tabs){
+		var origin = getOrigin(tabs[0].url);
+		var originTab = tabs[0];
+		var index = originTab.index;
+		chrome.windows.getAll({"populate" : true}, function(windows){
+			var numWindows = windows.length;
+			for (var i = 0; i < numWindows; i++) {
+				var win = windows[i];
+				var numTabs = win.tabs.length;
+		    	for (var j = 0; j < numTabs; j++) {
+		        	var tab = win.tabs[j];
+		        	if(getOrigin(tab.url) === origin) {
+						if(tab != originTab) {
+							moveTab(tab.id, index, originTab.windowId, null);
+							index++;
+						}
+		        	}
+		        }
+			}
+		});
+	});
+}
+
+//EXPLODE ORIGIN
